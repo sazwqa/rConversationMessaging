@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title>Conversation</title>
+    <%= stylesheet_link_tag 'scaffold' %>
+    <%= javascript_include_tag :defaults %>
+  </head>
+  <body>
+    <% if logged_in? -%>
+      <div style='float: right'>
+        Welcome <%= current_user.name %>!, you have <%= new_messages(current_user) %>
+      </div>
+      <ul id='nav'>
+        <li><%=link_to 'Logout',  logout_path %></li>
+        <li><%=link_to 'Inbox', inbox_path %></li>
+        <li><%=link_to 'Outbox', outbox_path %></li>
+        <li><%=link_to 'Compose', compose_path %></li>
+    <% else -%>
+      <ul id='nav'>
+        <li><%=link_to 'Signup', signup_path %></li>
+        <li><%=link_to 'Login', login_path %></li>
+    <% end -%>
+    </ul>
+    <br style='clear: left' />
+    <br />
+    <p style="color: green"><%= flash[:notice] %></p>
+    <p style="color: red"><%= flash[:error] %></p>
+    <%= yield  %>
+  </body>
+</html>

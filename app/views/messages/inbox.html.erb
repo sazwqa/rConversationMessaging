@@ -1,0 +1,13 @@
+<h1>Inbox</h1>
+<% unless @threads.blank? %>
+  <% for thread in @threads do %>
+  <% last_message = Message.find(:all, :conditions => ["thread_id = ? AND follower_id = ?", thread.id, @current_user], :order => 'created_at').last %>
+    <div style='float: left; width: 100px;'>From : <%= last_message.originator.name %></div>
+    <div style='float: left; width: 200px;'><%= link_to(thread.title, {:action => 'show', :id => thread.id, :location => @location }) %></div>
+    <div style='float: left; width: 200px;'><%= thread.body %></div>
+    <div style='float: left; width: 100px;'><%= link_to('delete', {:action => 'destroy', :id => thread.id, :location => 'inbox' }) %></div>
+    <br style='clear: left' />
+  <% end %>
+<% else %>
+  NO threads
+<% end %>

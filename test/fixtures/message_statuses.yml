@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  message_id: 1
+  originator_inbox: 1
+  originator_outbox: 1
+  follower_inbox: 1
+  follower_outbox: 1
+
+two:
+  message_id: 1
+  originator_inbox: 1
+  originator_outbox: 1
+  follower_inbox: 1
+  follower_outbox: 1

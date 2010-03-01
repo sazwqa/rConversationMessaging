@@ -1,0 +1,18 @@
+<h1>Compose new message</h1>
+
+<%= error_messages_for 'message' %>
+
+<% form_tag :action => 'compose' do %>
+  
+  <p><label for="message_to">To user</label><br/>
+  <%= text_field 'message', 'to' %></p>
+  
+  <p><label for="message_title">Title</label><br/>
+  <%= text_field 'message', 'title'  %></p>
+  
+  <p><label for="message_body">Body</label><br/>
+  <%= text_area 'message', 'body' %></p>
+  
+  <%= submit_tag "Send message" %>
+  
+<% end %>

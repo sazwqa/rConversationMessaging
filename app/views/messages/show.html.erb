@@ -1,0 +1,35 @@
+<% user = (@thread.originator == @current_user ? @thread.follower : @thread.originator ) %>
+
+<h1>Show Message, called from <%= params[:location] %></h1>
+<br />
+
+<h2><%= @thread.title %></h2>
+<h3>Between <%= user.name %> and You.</h2>
+
+<hr />
+
+<% for message in @messages do %>
+  <div style='float: left; width: 100px;'>From : <%= message.originator.name %></div>
+  <div style='float: left; width: 200px;'><%= message.title %></div>
+  <div style='float: left; width: 200px;'><%= message.body %></div>
+  <br style='clear: left' />
+<% end %>
+<hr />
+<h3>Reply to message</h3>
+
+<%= error_messages_for 'message' %>
+
+<% form_tag :action => 'reply', :id => @thread.id do %>
+
+  <p><label>Title : <%= "re: #{@thread.title}" %></label></p>
+  
+  <p><label>To user : <%= "#{user.name}" %></label></p>
+  
+  <p><label for="message_body">Body</label><br/>
+  <%= text_area 'message', 'body' %></p>
+  
+  <%= submit_tag "Send message" %>
+<% end %>
+
+<hr />
+<%=link_to 'Delete Thread', {:action => 'destroy', :id => @thread.id, :location => params[:location] }%>
