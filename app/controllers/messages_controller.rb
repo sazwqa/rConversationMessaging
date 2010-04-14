@@ -37,8 +37,8 @@ class MessagesController < ApplicationController
     if last_message.originator == current_user
       new_message = Message.create(:originator => current_user, :follower => last_message.follower, :title => "re: #{thread.title}", :body => params[:message][:body], :thread_id => thread.id)
       # check if the message has been deleted by the follower or originator, we need to restore that
-      thread.status.update_attribute(:follower_inbox, 2) if thread.status.follower_inbox == 0
-      thread.status.update_attribute(:originator_inbox, 2) if thread.status.originator_inbox == 0
+      thread.status.update_attribute(:follower_inbox, MessageStatus::STATUS['read']) if thread.status.follower_inbox == MessageStatus::STATUS['deleted']
+      thread.status.update_attribute(:originator_inbox, MessageStatus::STATUS['read']) if thread.status.originator_inbox == MessageStatus::STATUS['deleted']
     # normal case, follower replying to originator's message
     else
       # create a new message
@@ -62,7 +62,7 @@ class MessagesController < ApplicationController
     return if current_user.outbox_messages.blank?
     current_user.outbox_messages.each do |message|
       thread = Message.find(message.thread_id)
-      ( current_user == thread.follower ? (@threads << thread if thread.status.follower_outbox != 0) : (@threads << thread if thread.status.originator_outbox != 0))
+      ( current_user == thread.follower ? (@threads << thread if thread.status.follower_outbox != MessageStatus::STATUS['deleted']) : (@threads << thread if thread.status.originator_outbox != MessageStatus::STATUS['deleted']))
     end
     @threads.uniq!
   end
@@ -74,7 +74,7 @@ class MessagesController < ApplicationController
     current_user.inbox_messages.each do |message|
       thread = Message.find(message.thread_id)
       # if i started the thread
-      current_user == thread.originator ? (@threads << thread if thread.status.originator_inbox != 0) : (@threads << thread if thread.status.follower_inbox != 0)
+      current_user == thread.originator ? (@threads << thread if thread.status.originator_inbox != MessageStatus::STATUS['deleted']) : (@threads << thread if thread.status.follower_inbox != MessageStatus::STATUS['deleted'])
     end
     @threads.uniq!
   end
@@ -84,10 +84,10 @@ class MessagesController < ApplicationController
     # find thread
     @thread = Message.find(params[:id])
     # read all the message for that thread
-    @thread.status.update_attribute(:originator_inbox, MessageStatus::STATUS['read']) if @thread.status.originator_inbox == 2 && current_user == @thread.originator # he is looking @ his reply
-    @thread.status.update_attribute(:originator_outbox, MessageStatus::STATUS['read']) if @thread.status.originator_outbox == 2
-    @thread.status.update_attribute(:follower_inbox, MessageStatus::STATUS['read']) if @thread.status.follower_inbox == 2 && current_user != @thread.originator # he is looking @ his reply
-    @thread.status.update_attribute(:follower_outbox, MessageStatus::STATUS['read']) if @thread.status.follower_outbox == 2
+    @thread.status.update_attribute(:originator_inbox, MessageStatus::STATUS['read']) if @thread.status.originator_inbox == MessageStatus::STATUS['unread'] && current_user == @thread.originator # he is looking @ his reply
+    @thread.status.update_attribute(:originator_outbox, MessageStatus::STATUS['read']) if @thread.status.originator_outbox == MessageStatus::STATUS['unread']
+    @thread.status.update_attribute(:follower_inbox, MessageStatus::STATUS['read']) if @thread.status.follower_inbox == MessageStatus::STATUS['unread'] && current_user != @thread.originator # he is looking @ his reply
+    @thread.status.update_attribute(:follower_outbox, MessageStatus::STATUS['read']) if @thread.status.follower_outbox == MessageStatus::STATUS['unread']
     # find all messages of thread
     @messages = Message.find(:all, :conditions => ['thread_id = ?', @thread.id], :order => 'created_at')
   end
